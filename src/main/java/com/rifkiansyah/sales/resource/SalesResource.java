@@ -68,18 +68,13 @@ public class SalesResource {
         final String CSV_FILE = "./sales-report.csv";
 
         List<Sales> temp = salesRepository.findByItemcode(itemcode);
-        //should get result set.
         try (
                 BufferedWriter writer = Files.newBufferedWriter(Paths.get(CSV_FILE));
 
                 CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT
-                        .withHeader("Receipt ID", "Item Code", "Item Name", "Quantity", "Price", "User Name", "Transaction Time"));
+                        .withHeader("ID", "Item Name", "Transaction Time", "Quantity", "User Name", "Item Code", "Receipt ID", "Price"));
         ) {
-            csvPrinter.printRecord("1", "Sundar Pichai ♥", "CEO", "Google");
-            csvPrinter.printRecord("2", "Satya Nadella", "CEO", "Microsoft");
-            csvPrinter.printRecord("3", "Tim cook", "CEO", "Apple");
-
-            csvPrinter.printRecord(Arrays.asList("4", "Mark Zuckerberg", "CEO", "Facebook"));
+            csvPrinter.printRecords(temp);
 
             csvPrinter.flush();
         }
