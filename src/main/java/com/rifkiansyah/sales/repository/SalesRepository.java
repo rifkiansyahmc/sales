@@ -8,6 +8,6 @@ import java.util.List;
 public interface SalesRepository extends JpaRepository<Sales, Integer> {
     List<Sales> findByUsername(String username);
 
-    List<Sales> findByItemname(String itemname);
+    List<Sales> findByItemcode(Long itemcode);
 
 }
