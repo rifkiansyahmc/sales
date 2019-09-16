@@ -67,7 +67,7 @@ public class SalesResource {
         return getSales(sales.getUsername());
     }
 
-    @PostMapping("/delete/{username}")
+    @DeleteMapping("/delete/{username}")
     public boolean deleteSales(@PathVariable("username") String username){
         log.debug("Request to delete all from username : {}", username);
         List<Sales> sales = salesRepository.findByUsername(username);
@@ -95,7 +95,7 @@ public class SalesResource {
 
     }
 
-    @PostMapping("/update-inventory")
+    @PutMapping("/update-inventory")
     public void updateInventoryQuantity(Long quantity, Long itemcode){
         log.debug("Request to update quantity : {}", itemcode);
         //get update function from inventory service, pass the parameter above.
