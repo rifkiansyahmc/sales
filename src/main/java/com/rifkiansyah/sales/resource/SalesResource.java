@@ -6,7 +6,14 @@ import com.rifkiansyah.sales.service.CodeGenService;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.aspectj.apache.bcel.classfile.Code;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -19,6 +26,11 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/rest/sales")
 public class SalesResource {
+
+    @Autowired
+    RestTemplate restTemplate;
+
+    private final Logger log = LoggerFactory.getLogger(SalesResource.class);
 
     private SalesRepository salesRepository;
     private final CodeGenService codeGenService = new CodeGenService();
@@ -39,7 +51,7 @@ public class SalesResource {
 
     @PostMapping("/add")
     public List<String> addSales(@RequestBody Sales sales){
-
+        log.debug("Request to add sales : {}", sales);
         String receipt = codeGenService.initGen("SLS");
 
         Sales temp = new Sales();
@@ -57,6 +69,7 @@ public class SalesResource {
 
     @PostMapping("/delete/{username}")
     public boolean deleteSales(@PathVariable("username") String username){
+        log.debug("Request to delete all from username : {}", username);
         List<Sales> sales = salesRepository.findByUsername(username);
         salesRepository.delete((Sales) sales);
 
@@ -65,6 +78,7 @@ public class SalesResource {
 
     @PostMapping("/report/{itemcode}")
     public void generateItemReport(@PathVariable("itemcode") Long itemcode) throws IOException {
+        log.debug("Request to generate item report : {}", itemcode);
         final String CSV_FILE = "./sales-report.csv";
 
         List<Sales> temp = salesRepository.findByItemcode(itemcode);
@@ -78,6 +92,18 @@ public class SalesResource {
 
             csvPrinter.flush();
         }
+
+    }
+
+    @PostMapping("/update-inventory")
+    public void updateInventoryQuantity(Long quantity, Long itemcode){
+        log.debug("Request to update quantity : {}", itemcode);
+        //get update function from inventory service, pass the parameter above.
+        ResponseEntity<List<String>> inventoryResponse = restTemplate.exchange("http://inventory-service/rest/inventory/" + itemcode, HttpMethod.GET,
+                null, new ParameterizedTypeReference<List<String>>() {
+                });
+
+        List<String> inventories = inventoryResponse.getBody();
 
     }
 
