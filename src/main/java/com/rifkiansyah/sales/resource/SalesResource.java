@@ -40,17 +40,15 @@ public class SalesResource {
     }
 
     @GetMapping("/{username}")
-    public List<String> getSales(@PathVariable("username")
+    public List<Sales> getSales(@PathVariable("username")
                                              String username){
 
-        return salesRepository.findByUsername(username)
-                .stream()
-                .map(Sales::getItemname)
-                .collect(Collectors.toList());
+        return salesRepository.findByUsername(username);
+
     }
 
     @PostMapping("/add")
-    public List<String> addSales(@RequestBody Sales sales){
+    public List<Sales> addSales(@RequestBody Sales sales){
         log.debug("Request to add sales : {}", sales);
         String receipt = codeGenService.initGen("SLS");
 
